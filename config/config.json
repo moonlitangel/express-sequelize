@@ -1,7 +1,10 @@
 {
   "development": {
-    "dialect": "sqlite",
-    "storage": "./db.development.sqlite"
+    "username": "root",
+    "password": "MoonlitAngel1!",
+    "database": "store_DB",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
   },
   "test": {
     "dialect": "sqlite",
@@ -10,7 +13,7 @@
   "production": {
     "username": "root",
     "password": null,
-    "database": "database_production",
+    "database": "store_DB",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }
