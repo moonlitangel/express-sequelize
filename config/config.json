@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "MoonlitAngel1!",
-    "database": "store_DB",
+    "database": "dinner_book",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
@@ -15,6 +15,6 @@
     "password": null,
     "database": "store_DB",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "dinner_book"
   }
 }

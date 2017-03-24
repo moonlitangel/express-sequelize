@@ -11,6 +11,7 @@ var users  = require('./routes/users');
 var stores = require('./routes/stores');
 var menus = require('./routes/menus');
 var store_replies = require('./routes/store_replies');
+var post = require('./routes/post');
 
 var app = express();
 
@@ -35,7 +36,7 @@ app.use(function(req, res, next) {
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');    
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
@@ -43,16 +44,21 @@ app.use(function(req, res, next) {
 // Point static path to dist
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// console.error(store_replies);
+// console.error(post);
+
+
 app.use('/api', routes);
 app.use('/api/users', users);
 app.use('/api/stores', stores);
 app.use('/api/menu', menus);
 app.use('/api/reply', store_replies);
+app.use('/api/posts', post);
 
 // Catch all other routes and return the index file
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'dist/index.html'));
+// });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

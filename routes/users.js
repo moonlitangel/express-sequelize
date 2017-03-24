@@ -5,11 +5,21 @@ var hasher = require('wordpress-hash-node');
 var passport = require('passport');
 var auth = require('./auth');
 
+/* 인증 부분 삭제 */
+
 router.get('/', function(req, res) {
-  models.wd_users.findAll().then(function(wduser) {
+  models.user.findAll().then(function(wduser) {
     res.json(wduser);
   });
 }); //유저 전체 불러오기
+
+router.get('/:id', function(req, res) {
+  models.user.findOne({
+    where: { user_login: req.params.id }
+  }).then(function(user) {
+    res.json(user);
+  })
+})
 
 router.get('/userauth', function(req, res) {
   models.Userauth.findAll({
@@ -18,7 +28,7 @@ router.get('/userauth', function(req, res) {
       model: models.store,
       attributes: ['id', 'name']
     }, {
-      model: models.wd_users,
+      model: models.user,
       attributes: ['id', 'user_login', 'user_nickname']
     }]
   }).then(function(userauth) {
@@ -27,7 +37,7 @@ router.get('/userauth', function(req, res) {
 }); // 유저 권한 불러오기 (가게 + 권한)
 
 router.get('/auth', function(req, res) {
-  models.wd_users.findAll({
+  models.user.findAll({
     include: [{ 
       model: models.Userauth,
       attributes: ['id', 'auth']
@@ -38,7 +48,7 @@ router.get('/auth', function(req, res) {
 }); // 권한 유저
 
 router.get('/nick', function(req, res) {
-  models.wd_users.findAll({
+  models.user.findAll({
     attributes: ['id', 'user_nickname']
   }).then(function(wduser) {
     res.json(wduser);
@@ -58,6 +68,41 @@ router.post('/login', function (req, res, next) {
   })(req, res, next);
 }); // 로그인 인증 후 토큰 반환
 
+router.get('/favorite/:id', function(req, res) {
+  models.favorite.findAll({
+    where: { userId: req.params.id },
+    include: [{ 
+      model: models.store,
+      include: [{
+        model: models.storeImage,
+        attributes: ['id','img']
+      }]
+    }]
+  }).then(function(favorite) {
+    res.json(favorite);
+  });
+});
+
+router.post('/create/favorite', function(req, res) {
+  models.favorite.create({
+    storeId: req.body.storeId,
+    userId: req.body.userId
+  }).then(function() {
+    res.json({result: '즐겨찾기 생성'});
+  });
+})
+
+router.delete('/delete/favorite/:storeId/:userId', function(req, res) {
+  models.favorite.destroy({
+    where: {
+      storeId: req.params.storeId,
+      userId: req.params.userId
+    }
+  }).then(function() {
+    res.json({result: '즐겨찾기 제거'});
+  });
+})
+
 router.post('/auth/:user_id', function(req, res) {
   models.Userauth.create({
     auth: req.body.auth,
@@ -70,7 +115,7 @@ router.post('/auth/:user_id', function(req, res) {
 
 router.post('/createwd', function(req, res) {
   var hash = hasher.HashPassword(req.body.password);
-  models.wd_users.create({
+  models.user.create({
     user_login: req.body.id,
     user_pass: hash,
     user_nickname: req.body.nickname
@@ -83,17 +128,26 @@ router.post('/createwd', function(req, res) {
   });
 });  // 계정 생성
 
+router.post('/create', function(req, res) {
+  models.user.create({
+    user_login: req.body.user_login,
+    user_nickname: req.body.user_nickname
+    }).then((user) => {
+    res.json({result: '아이디가 생성됨'});
+  });
+})
+
 router.put('/update', function(req, res) {
-  models.Userauth.update(
+  models.user.update(
     req.body, {
-      where: { id: req.body.id }
-    }).then((userauth) => {
+      where: { user_login: req.body.user_login }
+    }).then((user) => {
       res.json({result:1});
   });
 }); // 계정 권한 수정
 
 router.delete('/:user_id/destroy', function(req, res) {
-  models.wd_users.destroy({
+  models.user.destroy({
     where: {
       id: req.params.user_id
     }
